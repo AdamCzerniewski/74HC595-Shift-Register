@@ -72,16 +72,23 @@ class Main(qtw.QMainWindow):
         except ValueError:
             QMessageBox.warning(None, "Value Error", "Please Enter a Number (Ex. 0)", QMessageBox.Ok)
         
+        if self.ui.rbtn_regLeftShift.isChecked() == False and self.ui.rbtn_regRightShift.isChecked() == False and shiftValue == 0:
+                
+                # Send the data to spiWrite()
+                self.spiWrite(int(registerValue))
+                print("sent")
+        
+                # Converts the data to the "LED numbering" format for the user
+                self.convertRegVal_LEDnum(int(registerValue))                
+                
+                # Displays the LEDs that are on
+                self.LEDstate(int(registerValue))                     
         
         # Shifts the bits to the left
         if self.ui.rbtn_regLeftShift.isChecked() == True:
             
             # If the shift value is 0, registerValue will not be shifted
             if shiftValue == 0:
-                
-                # Divide the data by 2 to shift the bits to the left
-                for i in range (0, shiftValue):
-                    registerValue /= 2
                 
                 # Send the data to spiWrite()
                 self.spiWrite(int(registerValue))
@@ -115,10 +122,6 @@ class Main(qtw.QMainWindow):
             
             # If the shift value is 0, registerValue will not be shifted
             if shiftValue == 0:
-                
-                # Multiply the data by 2 to shift the bits to the right
-                for i in range (0, shiftValue):
-                    registerValue *= 2
                  
                 # Send the data to spiWrite()
                 self.spiWrite(int(registerValue))
@@ -178,6 +181,15 @@ class Main(qtw.QMainWindow):
         ledShifted = []
         
         regValue = 0
+
+        if self.ui.rbtn_regLeftShift.isChecked() == False and self.ui.rbtn_regRightShift.isChecked() == False and shiftValue == 0:
+                
+                for i in range (0, len(led)):
+                    ledNum = led[i]
+                    ledNum = int(ledNum)
+                    ledShifted.append(ledNum)
+                    print("Led shift", ledShifted)          
+        
         
         # Shifts the LEDs on display to the left
         if self.ui.rbtn_LEDleftShift.isChecked() == True:
