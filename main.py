@@ -62,30 +62,90 @@ class Main(qtw.QMainWindow):
     # Takes user input and sends to the spiWrite() function, which then turns on the LED(s)
     def shiftRegVal(self):
         registerValue = self.ui.tf_shiftRegVal.text(); registerValue = int(registerValue)
-        shiftValue = self.ui.tf_regShiftVal.text(); shiftValue = int(shiftValue)
+        shiftValue = self.ui.tf_regShiftVal.text()
 
         
         print("Value =", registerValue)
+               # Checks if the user put in a value for the shift (which can't be left blank to represent 0 due to issues)
+        try:
+            shiftValue = int(shiftValue)
+        except ValueError:
+            QMessageBox.warning(None, "Value Error", "Please Enter a Number (Ex. 0)", QMessageBox.Ok)
         
-        # Divide the data by 2 (x times) to shift the bits to the left
-        if self.ui.rbtn_regLeftShift.isChecked():
-            for i in range (0, shiftValue):
-                registerValue /= 2
+        
+        # Shifts the bits to the left
+        if self.ui.rbtn_regLeftShift.isChecked() == True:
+            
+            # If the shift value is 0, registerValue will not be shifted
+            if shiftValue == 0:
+                
+                # Divide the data by 2 to shift the bits to the left
+                for i in range (0, shiftValue):
+                    registerValue /= 2
+                
+                # Send the data to spiWrite()
+                self.spiWrite(int(registerValue))
+                print("sent")
+        
+                # Converts the data to the "LED numbering" format for the user
+                self.convertRegVal_LEDnum(int(registerValue))                
+                
+                # Displays the LEDs that are on
+                self.LEDstate(int(registerValue))                           
+            
+            else:
+            
+                # Divide the data by 2 to shift the bits to the left
+                for i in range (0, shiftValue):
+                    registerValue /= 2
+                
+                # Send the data to spiWrite()
+                self.spiWrite(int(registerValue))
+                print("sent")
+        
+                # Converts the data to the "LED numbering" format for the user
+                self.convertRegVal_LEDnum(int(registerValue))                
+                
+                # Displays the LEDs that are on
+                self.LEDstate(int(registerValue))       
 
-        # Multiply the data by 2 (x times) to shift the bits to the right
+        
+        # Shifts the bits to the right
         elif self.ui.rbtn_regRightShift.isChecked():
-            for i in range (0, shiftValue):
-                registerValue *= 2
+            
+            # If the shift value is 0, registerValue will not be shifted
+            if shiftValue == 0:
+                
+                # Multiply the data by 2 to shift the bits to the right
+                for i in range (0, shiftValue):
+                    registerValue *= 2
+                 
+                # Send the data to spiWrite()
+                self.spiWrite(int(registerValue))
+                print("sent")
         
-        # Send the data to spiWrite()
-        self.spiWrite(int(registerValue))
-        print("sent")
+                # Converts the data to the "LED numbering" format for the user
+                self.convertRegVal_LEDnum(int(registerValue))                    
+                 
+                # Displays the LEDs that are on
+                self.LEDstate(int(registerValue))       
+            
+            else:            
+            
+                # Multiply the data by 2 to shift the bits to the right
+                for i in range (0, shiftValue):
+                    registerValue *= 2
+
+                # Send the data to spiWrite()
+                self.spiWrite(int(registerValue))
+                print("sent")
         
-        # Converts the data to the "LED numbering" format for the user
-        self.convertRegVal_LEDnum(int(registerValue))
-        
-        # Displays the LEDs that are on
-        self.LEDstate(int(registerValue))        
+                # Converts the data to the "LED numbering" format for the user
+                self.convertRegVal_LEDnum(int(registerValue))
+                
+                # Displays the LEDs that are on
+                self.LEDstate(int(registerValue))                           
+     
     
     
     # Takes user input, converts into readable data, and sends to the spiWrite() function to turn on the LED(s)
