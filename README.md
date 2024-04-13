@@ -9,7 +9,7 @@ What it uses:
 - 8 LEDs to simulate the bits 
 - 1 LED to indicate if the circuit is powered (optional)
 - 4 pins connecting the Shift Register to the Raspberry Pi for SPI communication
-<img src="ShiftRegCiruitPinout1" width="350">
+<img src="https://github.com/AdamCzerniewski/74HC595-Shift-Register/blob/main/ShiftRegCiruitPinout1" width="350">
 
 HOW to use this:
 There are 4 inputs in the 'Shift Register Input' groupbox
