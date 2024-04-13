@@ -30,6 +30,7 @@ class Main(qtw.QMainWindow):
         
         self.ui.btn_shiftRegEnter.clicked.connect(self.shiftRegVal)
         self.ui.btn_enterLEDnum.clicked.connect(self.LEDnum)
+        self.ui.btn_allOff.clicked.connect(self.turnOffAllLEDs)
         
         self.ui.label_Q0.setStyleSheet("background-color: darkgrey")
         self.ui.label_Q1.setStyleSheet("background-color: darkgrey")
@@ -66,22 +67,27 @@ class Main(qtw.QMainWindow):
 
         
         print("Value =", shiftValue)
-               # Checks if the user put in a value for the shift (which can't be left blank to represent 0 due to issues)
-        # try:
-        #     shiftValue = int(shiftValue)
-        # except ValueError:
-        #     QMessageBox.warning(None, "Value Error", "Please Enter a Number (Ex. 0)", QMessageBox.Ok)
+            
+        # Checks if the user put in a value for the shift (which can't be left blank to represent 0 due to issues)
+        try:
+            shiftValue = int(shiftValue)
+        except ValueError:
+            QMessageBox.warning(None, "Value Error", "Please Enter a Number (Ex. 0)", QMessageBox.Ok)
         
         if self.ui.rbtn_regLeftShift.isChecked() == False and self.ui.rbtn_regRightShift.isChecked() == False and shiftValue == 0:
                 
-                # Send the data to spiWrite()
-                self.spiWrite(int(registerValue))
-                print("sent")
+                self.ui.tf_LEDshiftVal.setText('0')             
         
                 # Converts the data to the "LED numbering" format for the user
                 self.convertRegVal_LEDnum(int(registerValue))        
                 self.ui.tf_LEDshiftVal.setText(str(shiftValue))
+                self.ui.tf_regShiftVal.setText(str(shiftValue))
+
                 
+                # Send the data to spiWrite()
+                self.spiWrite(int(registerValue))
+                print("sent")
+                                
                 # Displays the LEDs that are on
                 self.LEDstate(int(registerValue))                     
         
@@ -93,7 +99,7 @@ class Main(qtw.QMainWindow):
             # If the shift value is 0, registerValue will not be shifted
             if shiftValue == 0:
                 
-                self.ui.tf_LEDshiftVal.setText(str(shiftValue))
+                self.ui.tf_LEDshiftVal.setText('0')
 
                 # Converts the data to the "LED numbering" format for the user
                 self.convertRegVal_LEDnum(int(registerValue)) 
@@ -101,15 +107,13 @@ class Main(qtw.QMainWindow):
                 # Send the data to spiWrite()
                 self.spiWrite(int(registerValue))
                 print("sent")
-        
-                self.ui.tf_LEDshiftVal.setText('0')                                
-                
+                        
                 # Displays the LEDs that are on
                 self.LEDstate(int(registerValue))                           
             
             else:
                 
-                self.ui.tf_LEDshiftVal.setText(shiftValue)
+                self.ui.tf_LEDshiftVal.setText(str(shiftValue))
 
                 # Converts the data to the "LED numbering" format for the user
                 self.convertRegVal_LEDnum(int(registerValue))                  
@@ -134,7 +138,7 @@ class Main(qtw.QMainWindow):
             # If the shift value is 0, registerValue will not be shifted
             if shiftValue == 0:
                 
-                self.ui.tf_LEDshiftVal.setText(str(shiftValue))
+                self.ui.tf_LEDshiftVal.setText('0')
                  
                 # Send the data to spiWrite()
                 self.spiWrite(int(registerValue))
@@ -149,6 +153,7 @@ class Main(qtw.QMainWindow):
             else:            
 
                 self.ui.tf_LEDshiftVal.setText(str(shiftValue))   
+                
 
                 # Converts the data to the "LED numbering" format for the user                
                 self.convertRegVal_LEDnum(int(registerValue))                
@@ -163,7 +168,9 @@ class Main(qtw.QMainWindow):
         
                 # Displays the LEDs that are on
                 self.LEDstate(int(registerValue))                           
-     
+                
+            self.ui.tf_LEDshiftVal.setText(str(shiftValue))
+
     
     
     # Takes user input, converts into readable data, and sends to the spiWrite() function to turn on the LED(s)
@@ -198,9 +205,18 @@ class Main(qtw.QMainWindow):
         ledShifted = []
         
         regValue = 0
-
+        
+        # if self.ui.tf_LEDnum == 0:
+        #     self.ui.tf_shiftRegVal.setText("0")
+        
+        
         if self.ui.rbtn_LEDleftShift.isChecked() == False and self.ui.rbtn_LEDrightShift.isChecked() == False and shiftValue == 0:
-                        
+            
+            # if self.ui.tf_LEDnum == 0:
+            #     self.ui.tf_shiftRegVal.setText("0")            
+            
+            self.ui.tf_regShiftVal.setText("0")
+            
             for i in range (0, len(led)):
                 ledNum = led[i]
                 ledNum = int(ledNum)
@@ -287,6 +303,7 @@ class Main(qtw.QMainWindow):
                     ledNum += shiftValue
                     ledShifted.append(ledNum)
                     print("Led shift", ledShifted)  
+            
             self.spiWrite(int(regValue))
 
                 
@@ -297,14 +314,36 @@ class Main(qtw.QMainWindow):
             print("LED Q[", led[i],"=] 1")
             
             # Goes through each value in the LED array and sets the color to green in the GUI
-            ledColor = getattr(self.ui,f"label_Q{ledShifted[i]}")         
+            ledColor = getattr(self.ui,f"label_Q{led[i]}")         
             ledColor.setStyleSheet("background-color: lightgreen")
         
             self.spiWrite(int(regValue))
 
             self.ui.tf_shiftRegVal.setText(str(regValue))  # Update the shift register value input field
         
+    def turnOffAllLEDs(self):
+        self.ui.label_Q0.setStyleSheet("background-color: darkgrey")
+        self.ui.label_Q1.setStyleSheet("background-color: darkgrey")
+        self.ui.label_Q2.setStyleSheet("background-color: darkgrey")
+        self.ui.label_Q3.setStyleSheet("background-color: darkgrey")
+        self.ui.label_Q4.setStyleSheet("background-color: darkgrey")
+        self.ui.label_Q5.setStyleSheet("background-color: darkgrey")
+        self.ui.label_Q6.setStyleSheet("background-color: darkgrey")
+        self.ui.label_Q7.setStyleSheet("background-color: darkgrey")          
+        
+        self.ui.rbtn_LEDleftShift.setChecked(False)
+        self.ui.rbtn_LEDrightShift.setChecked(False)
+        self.ui.rbtn_regLeftShift.setChecked(False)
+        self.ui.rbtn_regRightShift.setChecked(False)
 
+        self.ui.tf_shiftRegVal.setText("")
+        self.ui.tf_regShiftVal.setText("")
+        self.ui.tf_LEDnum.setText("")
+        self.ui.tf_LEDshiftVal.setText("")
+        self.spiWrite(0)
+        
+        
+        
     # Converts the shift register value to the LED numbers 
     def convertRegVal_LEDnum(self, binValue):
         # the binValue variable is converted to binary, adds on 0s till there are 8 digits, and flips the value from end to end (Ex. from 10100000 to 00000101)
@@ -313,10 +352,10 @@ class Main(qtw.QMainWindow):
         LEDarray = list(stateOfLED)
         LEDarray = [int(digit) for digit in LEDarray]
         print(LEDarray)
-        
+
         self.ui.tf_LEDnum.setText('')
-        #self.ui.tf_LEDshiftVal.setText('')        
-        
+        self.ui.tf_LEDshiftVal.setText('')       
+         
         # Goes through each value in LEDarray and updates the LED input field
         for i in range(0,len(LEDarray)):
             
